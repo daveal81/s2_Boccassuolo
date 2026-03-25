@@ -1,0 +1,89 @@
+import ee
+import geemap
+
+# ---------------------------------------------------------
+# 1️⃣ Initialize Google Earth Engine
+# ---------------------------------------------------------
+try:
+    # Locally, this will check for existing credentials. 
+    # If not found, it will prompt you to run ee.Authenticate()
+    ee.Initialize(project='ee-my-gmg-mapping') 
+except Exception as e:
+    print("Credentials not found or project ID invalid. Authenticating...")
+    ee.Authenticate()
+    ee.Initialize(project='ee-my-gmg-mapping')
+
+# ---------------------------------------------------------
+# 2️⃣ Create Map
+# ---------------------------------------------------------
+Map = geemap.Map()
+
+# ---------------------------------------------------------
+# 3️⃣ Load AOI and Landslide Polygons
+# ---------------------------------------------------------
+# Note: Ensure these assets are public or shared with your account
+aoi = ee.FeatureCollection('projects/ee-my-gmg-mapping/assets/Boccassuolo_AOI')
+landslide = ee.FeatureCollection('projects/ee-my-gmg-mapping/assets/boccasuolo_boundary')
+
+# ---------------------------------------------------------
+# 4️⃣ Define List of Dates
+# ---------------------------------------------------------
+dates = [
+    '2025-03-23', '2025-03-31', '2025-04-04', 
+    '2025-05-02', '2025-05-15', '2025-05-25', 
+    '2025-06-04', '2025-06-14', '2025-07-09'
+]
+
+# ---------------------------------------------------------
+# 5️⃣ Visualization Parameters
+# ---------------------------------------------------------
+rgbVis = {
+    'bands': ['B4', 'B3', 'B2'],
+    'min': 0,
+    'max': 3000,
+    'gamma': 1.3
+}
+
+# ---------------------------------------------------------
+# 6️⃣ Style AOI and Landslide Polygons
+# ---------------------------------------------------------
+styledAOI = aoi.style(color='red', width=2, fillColor='00000000')
+styledLandslide = landslide.style(color='blue', width=1, fillColor='00000000')
+
+# ---------------------------------------------------------
+# 7️⃣ Load and Add Sentinel-2 RGB Images
+# ---------------------------------------------------------
+for index, date in enumerate(dates):
+    start = ee.Date(date)
+    end = start.advance(1, 'day')
+
+    s2 = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+          .filterBounds(aoi)
+          .filterDate(start, end)
+          .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 80)))
+
+    # Use size().getInfo() sparingly; it's okay for small loops like this
+    if s2.size().getInfo() > 0:
+        img = s2.first()
+        is_latest = (index == len(dates) - 1)
+
+        Map.addLayer(
+            img.clip(aoi),
+            rgbVis,
+            f"RGB {date}",
+            shown=is_latest
+        )
+    else:
+        print(f"No image available on {date}")
+
+# ---------------------------------------------------------
+# 8️⃣ Add AOI and Landslide Layers Last
+# ---------------------------------------------------------
+Map.addLayer(styledAOI, {}, "AOI (outline)", True)
+Map.addLayer(styledLandslide, {}, "Landslide Boundary", False)
+
+# ---------------------------------------------------------
+# 9️⃣ Center and Display
+# ---------------------------------------------------------
+Map.centerObject(aoi, 14)
+Map # In Jupyter, simply calling the object displays it
