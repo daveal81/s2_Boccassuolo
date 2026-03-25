@@ -2,7 +2,7 @@ import ee
 import geemap
 
 # ---------------------------------------------------------
-# 1️⃣ Initialize Google Earth Engine
+# 1️⃣ Initialise Google Earth Engine
 # ---------------------------------------------------------
 try:
     # Locally, this will check for existing credentials. 
@@ -35,7 +35,7 @@ dates = [
 ]
 
 # ---------------------------------------------------------
-# 5️⃣ Visualization Parameters
+# 5️⃣ Visualisation Parameters
 # ---------------------------------------------------------
 rgbVis = {
     'bands': ['B4', 'B3', 'B2'],
@@ -83,7 +83,7 @@ Map.addLayer(styledAOI, {}, "AOI (outline)", True)
 Map.addLayer(styledLandslide, {}, "Landslide Boundary", False)
 
 # ---------------------------------------------------------
-# 9️⃣ Center and Display
+# 9️⃣ Centre and Display
 # ---------------------------------------------------------
 Map.centerObject(aoi, 14)
 Map # In Jupyter, simply calling the object displays it
