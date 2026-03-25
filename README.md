@@ -16,7 +16,8 @@ The workflow automates the retrieval of satellite imagery for a specific set of 
 * **Interactive Visualization:** Uses `geemap` to toggle between different satellite passes.
 * **Vector Overlays:** Displays the Area of Interest (AOI) and landslide boundaries with custom styling.
 
----
+### Example of output of Jupyter
+<img width="1440" height="580" alt="exaple" src="https://github.com/user-attachments/assets/aa7c8681-4846-42b6-b491-a3ff073f7b33" />
 
 ## 🛠️ Setup & Installation
 
@@ -27,3 +28,4 @@ If you are running this locally or on GitHub Codespaces, you must install the Ea
 
 ```bash
 pip install earthengine-api geemap
+
